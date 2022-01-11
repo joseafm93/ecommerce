@@ -80,7 +80,7 @@
 
     <nav id="navigation-menu" x-show="open" :class="{'block':open, 'hidden':!open}"
         class="bg-trueGray-700 bg-opacity-25 w-full absolute hidden">
-        <div class="container h-full">
+        <div class="container-menu h-full hidden sm:block">
             <div x-on:click.away="close()" class="grid grid-cols-4 h-full relative">
                 <ul class="bg-white">
                     @foreach ($categories as $category)
@@ -101,6 +101,23 @@
                     <x-navigation-subcategories :category="$categories->first()" />
                 </div>
             </div>
+        </div>
+        <div class="bg-white h-full overflow-y-auto">
+            <div class="container-menu bg-gray-200 py-3 mb-2">
+                @livewire('search')
+            </div>
+            <ul class="bg-white">
+                @foreach($categories as $category)
+                    <li class="text-trueGray-500 hover:bg-orange-500 hover:text-white">
+                        <a href="" class="py-2 px-4 text-sm flex items-center">
+                            <span class="flex justify-center w-9">
+                            {!! $category->icon !!}
+                            </span>
+                            {{ $category->name }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
         </div>
     </nav>
 </header>

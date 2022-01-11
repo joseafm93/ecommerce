@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,43 +18,42 @@
 
     <!-- Scripts -->
     <script src="{{ mix('js/app.js') }}" defer></script>
-    <script>
-        function dropdown() {
-            return {
-                open: false,
-                show() {
-                    if (this.open) {
-                        this.open = false;
-                        document.getElementsByTagName('html')[0].style.overflow = 'auto'
-                    } else {
-                        this.open = true;
-                        document.getElementsByTagName('html')[0].style.overflow = 'hidden'
-                    }
-                },
-                close() {
+</head>
+<body class="font-sans antialiased">
+<x-jet-banner />
+
+<div class="min-h-screen bg-gray-100">
+    @livewire('navigation')
+
+    <!-- Page Content -->
+    <main>
+        {{ $slot }}
+    </main>
+</div>
+
+@stack('modals')
+
+@livewireScripts
+
+<script>
+    function dropdown() {
+        return {
+            open: true,
+            show() {
+                if(this.open){
                     this.open = false;
                     document.getElementsByTagName('html')[0].style.overflow = 'auto'
+                }else{
+                    this.open = true;
+                    document.getElementsByTagName('html')[0].style.overflow = 'hidden'
                 }
+            },
+            close() {
+                this.open = false;
+                document.getElementsByTagName('html')[0].style.overflow = 'auto'
             }
         }
-    </script>
-</head>
-
-<body class="font-sans antialiased">
-    <x-jet-banner />
-
-    <div class="min-h-screen bg-gray-100">
-        @livewire('navigation')
-
-        <!-- Page Content -->
-        <main>
-            {{ $slot }}
-        </main>
-    </div>
-
-    @stack('modals')
-
-    @livewireScripts
+    }
+</script>
 </body>
-
 </html>
