@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CategoryFactory extends Factory
 {
@@ -19,7 +19,8 @@ class CategoryFactory extends Factory
         return [
             'name' => $name,
             'slug' => Str::slug($name),
-            'image'=> 'categories/'.$this->faker->image(storage_path('app/public/categories'),640,480, null, false)
+            'icon' => '<i class="fas fa-mobile-alt"></i>',
+            'image' => 'categories/' . $this->faker->image(storage_path('app/public/categories'), 640, 480, null, false)
         ];
     }
 }
