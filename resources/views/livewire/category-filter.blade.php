@@ -90,9 +90,9 @@
                                         </div>
                                     </div>
                                     <div class="mt-auto mb-6">
-                                        <x-jet-danger-button>
+                                        <x-danger-link href="{{ route('products.show', $product) }}">
                                             Más información
-                                        </x-jet-danger-button>
+                                        </x-danger-link>
                                     </div>
                                 </div>
                             </article>
