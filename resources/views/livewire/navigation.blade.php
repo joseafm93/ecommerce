@@ -1,4 +1,4 @@
-<header class="bg-trueGray-700 sticky z-50 top-0" x-data="dropdown()">
+<header class="bg-neutral-700 sticky z-50 top-0" x-data="dropdown()">
     <div class="container flex items-center h-16 justify-between md:justify-start">
         <a :class="{'bg-opacity-100 text-orange-500':open}"
         x-on:click="show()"
@@ -79,12 +79,12 @@
     </div>
 
     <nav id="navigation-menu" x-show="open" :class="{'block':open, 'hidden':!open}"
-        class="bg-trueGray-700 bg-opacity-25 w-full absolute hidden">
+        class="bg-neutral-700 bg-opacity-25 w-full absolute hidden">
         <div class="container-menu h-full hidden sm:block">
             <div x-on:click.away="close()" class="grid grid-cols-4 h-full relative">
                 <ul class="bg-white">
                     @foreach ($categories as $category)
-                        <li class="navigation-link text-trueGray-500 hover:bg-orange-500 hover:text-white">
+                        <li class="navigation-link text-neutral-500 hover:bg-orange-500 hover:text-white">
                             <a href="{{ route('categories.show', $category) }}" class="py-2 px-4 text-sm flex items-center">
                                 <span class="flex justify-center w-9">
                                     {!! $category->icon !!}
@@ -108,7 +108,7 @@
             </div>
             <ul class="bg-white">
                 @foreach($categories as $category)
-                    <li class="text-trueGray-500 hover:bg-orange-500 hover:text-white">
+                    <li class="text-neutral-500 hover:bg-orange-500 hover:text-white">
                         <a href="{{ route('categories.show', $category) }}" class="py-2 px-4 text-sm flex items-center">
                             <span class="flex justify-center w-9">
                             {!! $category->icon !!}
@@ -118,23 +118,22 @@
                     </li>
                 @endforeach
             </ul>
-
-            <p class="text-trueGray-500 px-6 my-2">USUARIOS</p>
+            <p class="text-neutral-500 px-6 my-2">USUARIOS</p>
 
             @livewire('cart-movil')
 
             @auth
-                <a href="{{ route('profile.show') }}" class="py-2 px-4 text-sm flex items-center text-trueGray-500 hover:bg-orange-500 hover:text-white">
+                <a href="{{ route('profile.show') }}"
+                   class="py-2 px-4 text-sm flex items-center text-neutral-500 hover:bg-orange-500 hover:text-white">
 
                     <span class="flex justify-center w-9">
                         <i class="far fa-address-card"></i>
                     </span>
-
                     Perfil
                 </a>
 
                 <div>
-                    <a href="" class="py-2 px-4 text-sm flex items-center text-trueGray-500 hover:bg-orange-500 hover:text-white">
+                    <a href="" class="py-2 px-4 text-sm flex items-center text-neutral-500 hover:bg-orange-500 hover:text-white">
 
                         <span class="flex justify-center w-9">
                             <i class="fas fa-shopping-cart"></i>
@@ -150,7 +149,7 @@
                 <a href=""
                    onclick="event.preventDefault();
                         document.getElementById('logout-form').submit()"
-                   class="py-2 px-4 text-sm flex items-center text-trueGray-500 hover:bg-orange-500 hover:text-white">
+                   class="py-2 px-4 text-sm flex items-center text-neutral-500 hover:bg-orange-500 hover:text-white">
 
                     <span class="flex justify-center w-9">
                         <i class="fas fa-sign-out-alt"></i>
@@ -162,7 +161,7 @@
                     @csrf
                 </form>
             @else
-                <a href="{{ route('login') }}" class="py-2 px-4 text-sm flex items-center text-trueGray-500 hover:bg-orange-500 hover:text-white">
+                <a href="{{ route('login') }}" class="py-2 px-4 text-sm flex items-center text-neutral-500 hover:bg-orange-500 hover:text-white">
                     <span class="flex justify-center w-9">
                         <i class="fas fa-user-circle"></i>
                     </span>
@@ -170,7 +169,7 @@
                     Iniciar sesión
                 </a>
 
-                <a href="{{ route('register') }}" class="py-2 px-4 text-sm flex items-center text-trueGray-500 hover:bg-orange-500 hover:text-white">
+                <a href="{{ route('register') }}" class="py-2 px-4 text-sm flex items-center text-neutral-500 hover:bg-orange-500 hover:text-white">
 
                     <span class="flex justify-center w-9">
                         <i class="fas fa-fingerprint"></i>
