@@ -29,7 +29,7 @@
             <h2 class="font-semibold text-center mt-4 mb-2">Marcas</h2>
             <ul class="divide-y divide-gray-200">
                 @foreach($category->brands as $brand)
-                    <li class="py-2 text-sm">
+                    <li class="py-2 text-sm ">
                         <a class="cursor-pointer hover:text-orange-500 capitalize {{ $marca == $brand->name ? 'text-orange-500 font-semibold' : '' }}"
                            wire:click="$set('marca', '{{ $brand->name }}')"
                         >{{ $brand->name }}</a>
