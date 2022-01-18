@@ -3,14 +3,14 @@
 @php
     switch ($color) {
         case 'gray':
-        $col = "#374151";
-        break;
+            $col = "#374151";
+            break;
         case 'white':
-        $col = "#ffffff";
-        break;
+            $col = "#ffffff";
+            break;
         default:
-        $col = "#374151";
-        break;
+            $col = "#374151";
+            break;
     }
 @endphp
 

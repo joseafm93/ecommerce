@@ -16,19 +16,19 @@ class CategoryFilter extends Component
 
     public function render()
     {
-        $productsQuery = Product::query()->whereHas('subcategory.category', function (Builder $query){
+        $productsQuery = Product::query()->whereHas('subcategory.category', function(Builder $query){
             $query->where('id', $this->category->id);
         });
 
         if ($this->subcategoria) {
-            $productsQuery = $productsQuery->whereHas('subcategory', function (Builder $query){
-               $query->where('name', $this->subcategoria);
+            $productsQuery = $productsQuery->whereHas('subcategory', function(Builder $query){
+                $query->where('name', $this->subcategoria);
             });
         }
 
         if ($this->marca) {
-            $productsQuery = $productsQuery->whereHas('brand', function (Builder $query){
-               $query->where('name', $this->marca);
+            $productsQuery = $productsQuery->whereHas('brand', function(Builder $query){
+                $query->where('name', $this->marca);
             });
         }
 
