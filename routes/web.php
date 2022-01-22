@@ -18,19 +18,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
-
 Route::get('/', WelcomeController::class);
 
 Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 
 Route::get('products/{product}', [ProductsController::class, 'show'])->name('products.show');
 
-Route::get('/deletecart', function () {
-    \Cart::destroy();
-});
+Route::get('orders/create', CreateOrder::class)->middleware('auth')->name('orders.create');
 
 Route::get('search', SearchController::class)->name('search');
 
