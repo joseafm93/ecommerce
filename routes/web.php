@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Livewire\CreateOrder;
 use App\Http\Livewire\ShoppingCart;
 use Illuminate\Support\Facades\Route;
 
