@@ -23,7 +23,6 @@
         <script src="{{ asset('vendor/glider-js/glider.min.js') }}"></script>
         <script src="{{ asset('vendor/flex-slider/node_modules/jquery/dist/jquery.js') }}"></script>
         <script src="{{ asset('vendor/flex-slider/jquery.flexslider-min.js') }}"></script>
-        <script src="{{ asset('vendor/ckeditor/build/ckeditor.js') }}"></script>
     </head>
     <body class="font-sans antialiased">
         <x-jet-banner />
@@ -41,7 +40,7 @@
 
         @livewireScripts
 
-        {{--<script>
+        <script>
             function dropdown() {
                 return {
                     open: false,
@@ -60,7 +59,7 @@
                     }
                 }
             }
-        </script>--}}
+        </script>
 
         @stack('scripts')
     </body>

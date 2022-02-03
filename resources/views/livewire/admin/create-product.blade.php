@@ -52,14 +52,14 @@
                       wire:model="description"
                       x-data
                       x-init="ClassicEditor.create($refs.miEditor)
-                          .then(function(editor){
+                        .then(function(editor){
                             editor.model.document.on('change:data', () => {
                                 @this.set('description', editor.getData())
                             })
-                          })
-                          .catch( error => {
+                        })
+                        .catch( error => {
                             console.error( error );
-                          } );"
+                        } );"
                       x-ref="miEditor">
             </textarea>
         </div>
