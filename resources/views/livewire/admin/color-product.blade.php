@@ -52,25 +52,58 @@
             </thead>
 
             <tbody>
-            @foreach($productColors as $color)
-                <tr>
-                    <td class="capitalize px-4 py-2">
-                        {{ __(ucfirst($colors->find($color->pivot->color_id)->name)) }}
-                    </td>
-                    <td class="px-4 py-2">
-                        {{ $color->pivot->quantity }} unidades
-                    </td>
-                    <td class="px-4 py-2 flex">
-                        <x-jet-secondary-button class="ml-auto mr-2">
-                            Actualizar
-                        </x-jet-secondary-button>
-                        <x-jet-danger-button>
-                            Eliminar
-                        </x-jet-danger-button>
-                    </td>
-                </tr>
-            @endforeach
+                @foreach($productColors as $color)
+                    <tr>
+                        <td class="capitalize px-4 py-2">
+                            {{ __(ucfirst($colors->find($color->pivot->color_id)->name)) }}
+                        </td>
+                        <td class="px-4 py-2">
+                            {{ $color->pivot->quantity }} unidades
+                        </td>
+                        <td class="px-4 py-2 flex">
+                            <x-jet-secondary-button class="ml-auto mr-2">
+                                Actualizar
+                            </x-jet-secondary-button>
+                            <x-jet-danger-button>
+                                Eliminar
+                            </x-jet-danger-button>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
+
+    <x-jet-dialog-modal wire:model="open">
+        <x-slot name="title">
+            Editar colores
+        </x-slot>
+        <x-slot name="content">
+            <div class="mb-4">
+                <x-jet-label>
+                    Color
+                </x-jet-label>
+                <select class="form-control w-full">
+                    <option value="">Seleccione un color</option>
+                    @foreach ($colors as $color)
+                        <option value="{{ $color->id }}">{{ __(ucfirst($color->name)) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <x-jet-label>
+                    Cantidad
+                </x-jet-label>
+                <x-jet-input class="w-full" placeholder="Ingrese una cantidad" />
+            </div>
+        </x-slot>
+        <x-slot name="footer">
+            <x-jet-secondary-button>
+                Cancelar
+            </x-jet-secondary-button>
+            <x-jet-button>
+                Actualizar
+            </x-jet-button>
+        </x-slot>
+    </x-jet-dialog-modal>
 </div>
