@@ -16,6 +16,7 @@ class ColorSize extends Component
         'color_id' => 'required',
         'quantity' => 'required|numeric'
     ];
+    protected $listeners = ['delete'];
 
     public function mount()
     {
@@ -55,8 +56,14 @@ class ColorSize extends Component
         $this->pivot->save();
 
         $this->size = $this->size->fresh();
-        
+
         $this->open = false;
+    }
+
+    public function delete(TbPivot $pivot)
+    {
+        $pivot->delete();
+        $this->size = $this->size->fresh();
     }
 
     public function render()
