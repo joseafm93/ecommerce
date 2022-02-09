@@ -14,6 +14,7 @@
                     </label>
                 @endforeach
             </div>
+
             <x-jet-input-error for="color_id" />
         </div>
         <div>
@@ -33,6 +34,7 @@
             </x-jet-button>
         </div>
     </div>
+
     @if ($productColors->count())
         <div class="bg-white shadow-lg rounded-lg p-6">
             <table>
@@ -59,11 +61,12 @@
                         </td>
                         <td class="px-4 py-2 flex">
                             <x-jet-secondary-button class="ml-auto mr-2"
-                                                    wire:click="edit({{ $color->pivot->id }})" wire:loading.attr="disabled"
-                                                    wire:target="edit({{ $color->pivot->id }})">
+                                    wire:click="edit({{ $color->pivot->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="edit({{ $color->pivot->id }})">
                                 Actualizar
                             </x-jet-secondary-button>
-                            <x-jet-danger-button wire:click="$emit('deleteColor', {{ $color->pivot->id }})">
+                            <x-jet-danger-button wire:click="$emit('deletePivot', {{ $color->pivot->id }})">
                                 Eliminar
                             </x-jet-danger-button>
                         </td>

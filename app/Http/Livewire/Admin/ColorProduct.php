@@ -60,6 +60,7 @@ class ColorProduct extends Component
     {
         $this->pivot->color_id = $this->pivot_color_id;
         $this->pivot->quantity = $this->pivot_quantity;
+
         $this->pivot->save();
 
         $this->product = $this->product->fresh();

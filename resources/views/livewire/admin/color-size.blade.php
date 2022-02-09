@@ -14,6 +14,7 @@
                     </label>
                 @endforeach
             </div>
+
             <x-jet-input-error for="color_id" />
         </div>
         <div>
