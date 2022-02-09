@@ -117,10 +117,10 @@
             <div>
                 <x-jet-label value="Cantidad" />
                 <x-jet-input
-                    wire:model="quantity"
+                    wire:model="product.quantity"
                     type="number"
                     class="w-full" />
-                <x-jet-input-error for="quantity" />
+                <x-jet-input-error for="product.quantity" />
             </div>
         @endif
 
@@ -137,15 +137,15 @@
                 Actualizar producto
             </x-jet-button>
         </div>
-    </div>
 
-    @if($this->subcategory)
-        @if($this->subcategory->size)
-            @livewire('admin.size-product', ['product' => $product], key('size-product-' . $product->id))
-        @elseif($this->subcategory->color)
-            @livewire('admin.color-product', ['product' => $product], key('color-product-' . $product->id))
+        @if($this->subcategory)
+            @if($this->subcategory->size)
+                @livewire('admin.size-product', ['product' => $product], key('size-product-' . $product->id))
+            @elseif($this->subcategory->color)
+                @livewire('admin.color-product', ['product' => $product], key('color-product-' . $product->id))
+            @endif
         @endif
-    @endif
+    </div>
 </div>
 
 @push('scripts')
@@ -165,5 +165,76 @@
                 Livewire.emit('refreshProduct');
             }
         };
+
+        Livewire.on('deleteSize', sizeId => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('admin.size-product', 'delete', sizeId);;
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+                }
+            })
+        })
+
+        Livewire.on('errorSize', mensaje => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: mensaje,
+            }) /* */
+        });
+
+        Livewire.on('deleteColor', pivot => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('admin.color-product', 'delete', pivot);
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+                }
+            })
+        })
+
+        Livewire.on('deleteColorSize', pivot => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('admin.color-size', 'delete', pivot);
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+                }
+            })
+        })
     </script>
 @endpush
