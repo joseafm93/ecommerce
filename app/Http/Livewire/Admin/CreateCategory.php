@@ -11,6 +11,7 @@ use Livewire\WithFileUploads;
 class CreateCategory extends Component
 {
     public $brands, $categories, $image;
+    public $listeners = ['delete'];
     public $createForm = [
         'name' => null,
         'slug' => null,
@@ -54,6 +55,12 @@ class CreateCategory extends Component
     public function updatedCreateFormName($value)
     {
         $this->createForm['slug'] = Str::slug($value);
+    }
+
+    public function delete(Category $category)
+    {
+        $category->delete();
+        $this->getCategories();
     }
 
     public function save()
