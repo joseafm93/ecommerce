@@ -10,7 +10,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::query();
+        $orders = Order::query()->where('status', '!=', 1);
 
         if (request('status')) {
             $orders->where('status', request('status'));
@@ -18,7 +18,7 @@ class OrderController extends Controller
 
         $orders = $orders->get();
 
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 2; $i <= 5; $i++) {
             $ordersByStatus[$i] = Order::where('status', $i)->count();
         }
 
@@ -27,6 +27,6 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        return view('admin.orders.show');
+        return view('admin.orders.show', compact('order'));
     }
 }
