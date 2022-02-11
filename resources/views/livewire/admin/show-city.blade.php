@@ -88,7 +88,7 @@
             </x-slot>
         </x-jet-dialog-modal>
     </div>
-    
+
     @push('scripts')
         <script>
             Livewire.on('deleteDistrict', districtId => {
