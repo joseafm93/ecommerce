@@ -26,11 +26,11 @@
                     <p>¿Esta subcategoría necesita especificar color?</p>
                     <div class="ml-auto">
                         <label>
-                            <input wire:model="createForm.color" type="radio" value="1" name="color">
+                            <input wire:model.defer="createForm.color" type="radio" value="1" name="color">
                             Si
                         </label>
                         <label>
-                            <input wire:model="createForm.color" type="radio" value="0" name="color">
+                            <input wire:model.defer="createForm.color" type="radio" value="0" name="color">
                             No
                         </label>
                     </div>
@@ -42,11 +42,11 @@
                     <p>¿Esta subcategoría necesita especificar talla?</p>
                     <div class="ml-auto">
                         <label>
-                            <input wire:model="createForm.size" type="radio" value="1" name="size">
+                            <input wire:model.defer="createForm.size" type="radio" value="1" name="size">
                             Si
                         </label>
                         <label>
-                            <input wire:model="createForm.size" type="radio" value="0" name="size">
+                            <input wire:model.defer="createForm.size" type="radio" value="0" name="size">
                             No
                         </label>
                     </div>

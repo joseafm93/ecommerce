@@ -11,7 +11,7 @@ class StatusOrder extends Component
     public function update()
     {
         $this->order->status = $this->status;
-        
+
         $this->order->save();
     }
 
