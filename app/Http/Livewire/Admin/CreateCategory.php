@@ -11,6 +11,8 @@ use Livewire\WithFileUploads;
 
 class CreateCategory extends Component
 {
+    use WithFileUploads;
+
     public $brands, $categories, $image, $image2;
     public $listeners = ['delete'];
     public $editImage;
