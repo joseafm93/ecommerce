@@ -23,7 +23,8 @@ class CreateProductsTable extends Migration
             $table->float('price');
             $table->foreignId('subcategory_id')->references('id')
                 ->on('subcategories')->onDelete('cascade');
-            $table->foreignId('brand_id')->references('id')->on('brands');
+            $table->foreignId('brand_id')->references('id')->on('brands')
+                ->on('brands')->onDelete('cascade');;
             $table->integer('quantity')->nullable();
             $table->enum('status', [Product::BORRADOR, Product::PUBLICADO])->default(Product::BORRADOR);
             $table->timestamps();
