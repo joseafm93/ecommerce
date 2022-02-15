@@ -47,7 +47,7 @@
                             {{ __('Admin') }}
                         </x-jet-dropdown-link>
                         @endrole
-                        
+
                         <div class="border-t border-gray-100"></div>
 
                         <!-- Authentication -->
