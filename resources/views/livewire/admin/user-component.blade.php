@@ -7,6 +7,10 @@
 
     <div class="container-menu py-12">
         <x-table-responsive>
+            <div class="px-6 py-4">
+                <x-jet-input wire:model="search" type="text" class="w-full" placeholder="Escriba algo para filtrar" />
+            </div>
+
             @if (count($users))
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
