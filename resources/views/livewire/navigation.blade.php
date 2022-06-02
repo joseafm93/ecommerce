@@ -6,7 +6,7 @@
             <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                 <path class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            <span class="text-sm hidden sm:block">
+            <span dusk="showcategory" class="text-sm hidden sm:block">
                 Categorías
             </span>
         </a>
@@ -19,7 +19,7 @@
             @livewire('search')
         </div>
 
-        <div class="mx-6 relative hidden md:block">
+        <div dusk="perfil" class="mx-6 relative hidden md:block">
             @auth
                 <x-jet-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -80,7 +80,7 @@
                 </x-jet-dropdown>
             @endauth
         </div>
-        <div class="hidden md:block">
+        <div dusk="dropdownCart" class="hidden md:block">
             @livewire('dropdown-cart')
         </div>
     </div>
@@ -94,7 +94,7 @@
                 <ul class="bg-white">
                     @foreach($categories as $category)
                         <li class="navigation-link text-trueGray-500 hover:bg-orange-500 hover:text-white">
-                            <a href="{{ route('categories.show', $category) }}" class="py-2 px-4 text-sm flex items-center">
+                            <a dusk="showsubcategory" href="{{ route('categories.show', $category) }}" class="py-2 px-4 text-sm flex items-center">
                                 <span class="flex justify-center w-9">
                                     {!! $category->icon !!}
                                 </span>
