@@ -2,13 +2,20 @@
 
 namespace Tests\Browser;
 
+use App\Http\Livewire\AddCartItem;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\City;
+use App\Models\Department;
+use App\Models\District;
 use App\Models\Image;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Subcategory;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
+use Livewire\Livewire;
 use Tests\DuskTestCase;
 
 class Semana3Test extends DuskTestCase
@@ -19,15 +26,24 @@ class Semana3Test extends DuskTestCase
     public function a_product_without_size_or_color_can_be_added_to_cart()
     {
         $category = Category::factory()->create();
-        $product = $this->createProduct($category);
 
-        $this->browse(function (Browser $browser) use ($category, $product) {
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        Image::factory()->create([
+            'imageable_id' => $product->id,
+            'imageable_type' => Product::class,
+        ]);
+
+        $this->browse(function (Browser $browser) use ($product) {
             $browser->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->assertButtonEnabled('@addItemToCart')
                 ->click('@addItemToCart')
-                ->pause(500)
                 ->click('@dropdownCart')
+                ->pause(500)
+                ->assertSee($product->name)
                 ->screenshot('product-can-be-added-to-cart');
         });
     }
@@ -36,38 +52,474 @@ class Semana3Test extends DuskTestCase
     public function a_product_with_color_can_be_added_to_cart()
     {
         $category = Category::factory()->create();
-        $product = $this->createProduct($category, Product::PUBLICADO, true);
+
+        $subcategory = $this->createSubcategory($category->id, true);
+        $brand = $this->createBrand($category->id);
+
+        $color = $this->createColor();
+
+        $product = $this->createProduct($subcategory->id, $brand->id, Product::PUBLICADO, array($color));
 
         $this->browse(function (Browser $browser) use ($category, $product) {
             $browser->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->assertButtonDisabled('@ColorAddItemToCart')
+                ->click('@colorSelect')
+                ->click('@color', 1)
+                ->pause(100)
+                ->assertButtonEnabled('@ColorAddItemToCart')
+                ->click('@ColorAddItemToCart')
+                ->click('@dropdownCart')
+                ->pause(500)
+                ->assertSee($product->name)
                 ->screenshot('product-with-color-can-be-added-to-cart');
         });
     }
 
-    private function createProduct($category, $status = Product::PUBLICADO, $color = false, $size = false) {
-        $subcategory = Subcategory::factory()->create([
-            'category_id' => $category->id,
-            'color' => $color,
-            'size' => $size
-        ]);
+    /** @test */
+    public function a_product_with_color_and_size_can_be_added_to_cart()
+    {
+        $category = Category::factory()->create();
 
-        $brand = Brand::factory()->create();
-        $category->brands()->attach($brand->id);
+        $subcategory = $this->createSubcategory($category->id, true, true);
+        $brand = $this->createBrand($category->id);
 
-        $product = Product::factory()->create([
-            'subcategory_id' => $subcategory->id,
-            'brand_id' => $brand->id,
-            'status' => $status,
-            'quantity' => 3,
-        ]);
+        $color = $this->createColor();
+
+        $product = $this->createProduct($subcategory->id, $brand->id, Product::PUBLICADO, array($color));
 
         Image::factory()->create([
             'imageable_id' => $product->id,
             'imageable_type' => Product::class,
         ]);
 
-        return $product;
+        $size = $this->createSize($product->id, array($color));
+
+        $this->browse(function (Browser $browser) use ($product) {
+            $browser->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->assertButtonDisabled('@ColorSizeAddItemToCart')
+                ->click('@sizeSelect')
+                ->pause(100)
+                ->click('@size', 1)
+                ->pause(100)
+                ->click('@colorSizeSelect')
+                ->click('@sizeColor', 1)
+                ->pause(500)
+                ->assertButtonEnabled('@ColorSizeAddItemToCart')
+                ->click('@ColorSizeAddItemToCart')
+                ->click('@dropdownCart')
+                ->pause(500)
+                ->assertSee($product->name)
+                ->screenshot('product-with-color-and-size-can-be-added-to-cart');
+        });
+    }
+
+    /** @test */
+    public function the_red_circle_increments_when_adding_a_product()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $this->browse(function (Browser $browser) use ($product) {
+            $browser->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->assertVisible('@cart0')
+                ->assertNotPresent('@cart+')
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->visit('/')
+                ->pause(500)
+                ->click('@dropdownCart')
+                ->assertSee('3')
+                ->screenshot('cart-red-circle');
+        });
+    }
+
+    /** @test */
+    public function the_limit_of_stock_is_the_limit_of_adding_that_product_to_the_cart()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct3($subcategory->id, $brand->id);
+
+        $this->browse(function (Browser $browser) use ($product) {
+            $browser->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@incrementButton')
+                ->pause(500)
+                ->click('@incrementButton')
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->assertButtonDisabled('@addItemToCart')
+                ->screenshot('stock-limit-adding-to-cart');
+        });
+    }
+
+    /** @test */
+    public function we_can_see_the_products_in_the_cart()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product2 = $this->createProduct($subcategory->id, $brand->id);
+
+        $this->browse(function (Browser $browser) use ($product, $product2) {
+           $browser->visit('/products/' . $product->slug)
+               ->pause(500)
+               ->click('@addItemToCart')
+               ->visit('/products/' . $product2->slug)
+               ->pause(500)
+               ->click('@addItemToCart')
+               ->pause(500)
+               ->visit('/shopping-cart')
+               ->pause(500)
+               ->assertSee('CARRITO DE COMPRAS')
+               ->assertSee($product->name)
+               ->assertSee($product2->name)
+               ->screenshot('see-products-in-cart');
+        });
+    }
+
+    /** @test */
+    public function we_can_change_the_product_quantity_in_the_cart()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $this->browse(function (Browser $browser) use ($product) {
+            $browser->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->visit('/shopping-cart')
+                ->pause(500)
+                ->assertSee('CARRITO DE COMPRAS')
+                ->assertSee($product->name)
+                ->assertSee($product->price)
+                ->click('@cartIncrementButton')
+                ->assertSee('Total: ' . 2*$product->price . ' €')
+                ->screenshot('change-product-quantity-in-cart');
+        });
+    }
+
+    /** @test */
+    public function we_can_delete_a_product_or_remove_all_in_the_cart()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product2 = $this->createProduct($subcategory->id, $brand->id);
+
+        $this->browse(function (Browser $browser) use ($product, $product2) {
+            $browser->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->visit('/shopping-cart')
+                ->pause(500)
+                ->assertSee('CARRITO DE COMPRAS')
+                ->assertSee($product->name)
+                ->click('@deleteProduct')
+                ->pause(500)
+                ->assertNotPresent($product->name)
+                ->assertSee('TU CARRITO DE COMPRAS ESTÁ VACÍO')
+                ->screenshot('delete-a-product-cart');
+
+            $browser->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->visit('/products/' . $product2->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->visit('/shopping-cart')
+                ->pause(500)
+                ->assertSee('CARRITO DE COMPRAS')
+                ->assertSee($product->name)
+                ->assertSee($product2->name)
+                ->pause(200)
+                ->click('@destroyCart')
+                ->pause(200)
+                ->assertSee('TU CARRITO DE COMPRAS ESTÁ VACÍO')
+                ->assert
+                ->screenshot('destroy-cart');
+        });
+    }
+
+    /** @test */
+    public function only_a_logged_user_can_make_orders()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $user = User::factory()->create();
+
+        $this->browse(function (Browser $browser) use ($product, $user) {
+            $browser->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->visit('/shopping-cart')
+                ->pause(500)
+                ->assertSee('CARRITO DE COMPRAS')
+                ->assertSee($product->name)
+                ->click('@continueToOrder')
+                ->pause(500)
+                ->assertPathIs('/login')
+                ->screenshot('not-logged-user-make-order');
+
+            $browser->loginAs($user)
+                ->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->visit('/shopping-cart')
+                ->pause(500)
+                ->assertSee('CARRITO DE COMPRAS')
+                ->assertSee($product->name)
+                ->pause(200)
+                ->click('@continueToOrder')
+                ->pause(500)
+                ->assertPathIs('/orders/create')
+                ->screenshot('logged-user-make-order');
+        });
+    }
+
+    /** @test */
+    public function the_cart_is_saved_on_DB_when_log_out()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $user = User::factory()->create();
+
+        $this->assertDatabaseCount('shoppingcart', 0);
+
+        $this->browse(function (Browser $browser) use ($product, $user) {
+            $browser->loginAs($user)
+                ->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->pause(500)
+                ->visit('/shopping-cart')
+                ->pause(500)
+                ->assertSee('CARRITO DE COMPRAS')
+                ->assertSee($product->name)
+                ->logout()
+                ->loginAs($user)
+                ->visit('/shopping-cart')
+                ->pause(500)
+                ->assertSee($product->name)
+                ->screenshot('cart-saved-DB');
+        });
+
+        $this->assertDatabaseCount('shoppingcart', 1);
+    }
+
+    /** @test */
+    public function form_is_visible_only_when_delivery_option_is_selected()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $user = User::factory()->create();
+
+        $this->browse(function (Browser $browser) use ($product, $user) {
+            $browser->loginAs($user)
+                ->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->visit('/orders/create')
+                ->pause(500)
+                ->assertDontSee('Departamento')
+                ->radio('envio_type', 1)
+                ->pause(500)
+                ->assertDontSee('Departamento')
+                ->radio('envio_type', 2)
+                ->pause(500)
+                ->assertSee('Departamento')
+                ->screenshot('form-delivery-option-order')
+                ->radio('envio_type', 1)
+                ->pause(500)
+                ->assertDontSee('Departamento');
+        });
+    }
+
+    /** @test */
+    public function the_order_is_made_and_the_cart_is_destroyed()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $user = User::factory()->create();
+
+        $this->browse(function (Browser $browser) use ($product, $user) {
+            $browser->loginAs($user)
+                ->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->visit('/orders/create')
+                ->pause(500)
+                ->type('@contactName', 'a')
+                ->type('@contactPhone', '1')
+                ->click('@createOrder')
+                ->pause(500)
+                ->assertPathIs('/orders/1/payment')
+                ->click('@dropdownCart')
+                ->pause(500)
+                ->assertSee('No tiene agregado ningún item en el carrito')
+                ->screenshot('order-made');
+        });
+    }
+
+    /** @test */
+    public function department_select_has_all_departments()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $user = User::factory()->create();
+
+        $departments = Department::factory(2)->create()->pluck('id')->all();
+
+        $this->browse(function (Browser $browser) use ($product, $user, $departments) {
+            $browser->loginAs($user)
+                ->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->visit('/orders/create')
+                ->pause(500)
+                ->radio('envio_type', 2)
+                ->pause(500)
+                ->click('@departmentSelect')
+                ->pause(500)
+                ->assertSelectHasOptions('departments', $departments)
+                ->screenshot('department-select');
+        });
+    }
+
+    /** @test */
+    public function cities_select_has_cities_from_its_department()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $user = User::factory()->create();
+
+        $departments = Department::factory(2)->create();
+        $cities= City::factory(2)->create([
+            'department_id'=> $departments[0]->id
+        ]);
+        $cities2= City::factory(2)->create([
+            'department_id'=> $departments[1]->id
+        ]);
+        $idCities = $cities->pluck('id')->all();
+        $idCities2 = $cities2->pluck('id')->all();
+
+        $this->browse(function (Browser $browser) use ($product, $user, $idCities, $idCities2) {
+            $browser->loginAs($user)
+                ->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->visit('/orders/create')
+                ->pause(500)
+                ->click('@delivery')
+                ->select('departments', 2)
+                ->pause(500)
+                ->click('@citySelect')
+                ->assertSelectHasOptions('cities', $idCities2)
+                ->assertSelectMissingOptions('cities', $idCities)
+                ->screenshot('cities-select');
+        });
+    }
+
+    /** @test */
+    public function districts_select_has_districts_from_its_city()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+        $product = $this->createProduct($subcategory->id, $brand->id);
+
+        $user = User::factory()->create();
+
+        $departments = Department::factory(2)->create();
+        $cities= City::factory(2)->create([
+            'department_id'=> $departments[0]->id
+        ]);
+        $districts = District::factory(2)->create([
+            'city_id'=>$cities[0]->id
+        ]);
+        $districts2 = District::factory(2)->create([
+            'city_id'=>$cities[1]->id
+        ]);
+
+        $idDistricts = $districts->pluck('id')->all();
+        $idDistricts2 = $districts2->pluck('id')->all();
+
+        $this->browse(function (Browser $browser) use ($product, $user, $idDistricts, $idDistricts2) {
+            $browser->loginAs($user)
+                ->visit('/products/' . $product->slug)
+                ->pause(500)
+                ->click('@addItemToCart')
+                ->visit('/orders/create')
+                ->pause(500)
+                ->click('@delivery')
+                ->select('departments', 1)
+                ->pause(500)
+                ->select('cities', 1)
+                ->pause(500)
+                ->click('@districtSelect')
+                ->pause(500)
+                ->assertSelectHasOptions('districts', $idDistricts)
+                ->assertSelectMissingOptions('districts', $idDistricts2)
+                ->screenshot('districts-select');
+        });
     }
 }

@@ -16,7 +16,7 @@
             <ul class="divide-y divide-gray-200">
                 @foreach($category->subcategories as $subcategory)
                     <li class="py-2 text-sm ">
-                        <a dusk="filterSubcategory" class="cursor-pointer hover:text-orange-500 capitalize {{ $subcategoria == $subcategory->slug ? 'text-orange-500 fontsemibold' : '' }}"
+                        <a dusk="subcategory-{{ $subcategory->id }}" class="cursor-pointer hover:text-orange-500 capitalize {{ $subcategoria == $subcategory->slug ? 'text-orange-500 fontsemibold' : '' }}"
                            wire:click="$set('subcategoria', '{{ $subcategory->slug }}')"
                         >{{ $subcategory->name }}</a>
                     </li>
@@ -27,7 +27,7 @@
             <ul class="divide-y divide-gray-200">
                 @foreach($category->brands as $brand)
                     <li class="py-2 text-sm ">
-                        <a dusk="filterBrand" class="cursor-pointer hover:text-orange-500 capitalize {{ $marca == $brand->name ? 'text-orange-500 font-semibold' : '' }}"
+                        <a dusk="brand-{{ $brand->id }}" class="cursor-pointer hover:text-orange-500 capitalize {{ $marca == $brand->name ? 'text-orange-500 font-semibold' : '' }}"
                            wire:click="$set('marca', '{{ $brand->name }}')"
                         >{{ $brand->name }}</a>
                     </li>
@@ -63,7 +63,7 @@
                         <li class="md:col-span-2 lg:col-span-4">
                             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                                 <strong class="font-bold">Upss!</strong>
-                                <span class="block sm:inline">No existen productos con ese filtro.</span>
+                                <span class="block sm:inline">No existen productos con este filtro.</span>
                             </div>
                         </li>
                     @endforelse
@@ -73,10 +73,12 @@
                     @forelse($products as $product)
                         <x-product-list :product="$product"></x-product-list>
                     @empty
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                            <strong class="font-bold">Upss!</strong>
-                            <span class="block sm:inline">No existen productos con ese filtro.</span>
-                        </div>
+                        <li class="md:col-span-2 lg:col-span-4">
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                                <strong class="font-bold">Upss!</strong>
+                                <span class="block sm:inline">No existen productos con este filtro.</span>
+                            </div>
+                        </li>
                     @endforelse
                 </ul>
             @endif

@@ -6,9 +6,12 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Image;
+use App\Models\Product;
 use App\Models\Size;
 use App\Models\Subcategory;
+use App\Models\User;
 use Faker\Factory;
+use Laravel\Jetstream\Role;
 
 trait TestHelpers
 {
@@ -41,7 +44,7 @@ trait TestHelpers
         ]);
     }
 
-    protected function createBrand()
+    protected function createBrand($categoryId)
     {
         $brand = Brand::factory()->create();
         $category = Category::find($categoryId);
@@ -50,19 +53,92 @@ trait TestHelpers
         return $brand;
     }
 
-    protected function createSize()
+    protected function createSize($productId, $colors)
     {
         $size = Size::factory()->create([
             'product_id' => $productId
         ]);
 
+        foreach ($colors as $color) {
+            $size->colors()
+                ->attach([
+                    $color->id => ['quantity' => 12]
+                ]);
+        }
+
+        return $size;
+    }
+
+    protected function createSize3($productId, $colors)
+    {
+        $size = Size::factory()->create([
+            'product_id' => $productId
+        ]);
 
         foreach ($colors as $color) {
             $size->colors()->attach([
-                $color->id => ['quantity' => 12]
+                $color->id => ['quantity' => 1]
             ]);
         }
 
         return $size;
+    }
+
+    protected function createProduct($subcategoryId, $brandId, $status = Product::PUBLICADO, $colors = null)
+    {
+        $subcategory = Subcategory::find($subcategoryId);
+
+        $product = Product::factory()->create([
+            'subcategory_id' => $subcategoryId,
+            'brand_id' => $brandId,
+            'quantity' => $subcategory->color ? null : 15,
+            'status' => $status,
+        ]);
+
+        if ($subcategory->color && !$subcategory->size && is_array($colors)) {
+            foreach ($colors as $color) {
+                $product->colors()->attach([
+                   $color->id => ['quantity' => 10]
+                ]);
+            }
+        }
+
+        $this->createImage($product->id, Product::class);
+
+        return $product;
+    }
+
+    protected function createProduct3($subcategoryId, $brandId, $status = Product::PUBLICADO, $colors = null)
+    {
+        $subcategory = Subcategory::find($subcategoryId);
+
+        $product = Product::factory()->create([
+            'subcategory_id' => $subcategoryId,
+            'brand_id' => $brandId,
+            'quantity' => $subcategory->color ? null : 3,
+            'status' => $status,
+        ]);
+
+        if ($subcategory->color && !$subcategory->size && is_array($colors)) {
+            foreach ($colors as $color) {
+                $product->colors()->attach([
+                    $color->id => ['quantity' => '3']
+                ]);
+            }
+        }
+
+        $this->createImage($product->id, Product::class);
+
+        return $product;
+    }
+
+    protected function createAdminUser()
+    {
+        $adminRole = Role::create(['name' => 'admin']);
+
+        $user = User::factory()->create();
+        $user->assignRole($adminRole);
+
+        return $user;
     }
 }

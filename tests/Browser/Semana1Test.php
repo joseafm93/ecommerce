@@ -30,7 +30,7 @@ class Semana1Test extends DuskTestCase
             $browser->visit('/')
                     ->click('@showcategory')
                     ->assertSee($category->name)
-                    ->screenshot('example-test');
+                    ->screenshot('category-showed-in-navigation-menu');
         });
     }
 
@@ -50,16 +50,7 @@ class Semana1Test extends DuskTestCase
                 ->click('@showcategory')
                 ->mouseover('@showsubcategory')
                 ->assertSee($subcategory->name)
-                ->screenshot('example-test');
+                ->screenshot('subcategory-showed-in-navigation-menu');
         });
     }
-
-    /*public function a_user_can_login(Browser $browser)
-    {
-        $user = User::factory()->create([
-           'email' => 'acho@example.com',
-        ]);
-
-        $browser->visit()
-    }*/
 }

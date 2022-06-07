@@ -18,7 +18,7 @@ class SubcategoryFactory extends Factory
         $category = Category::all()->random();
         $color = collect([true, false])->random();
         $size = collect([true, false])->random();
-        $name = $this->faker->sentence(2);
+        $name = $this->faker->sentence;
 
         return [
             'category_id' => $category->id,
@@ -26,6 +26,7 @@ class SubcategoryFactory extends Factory
             'slug' => Str::slug($name),
             'color' => $color,
             'size' => $color ? $size : false,
+            //'image' => 'subcategories/' . $this->faker->image(storage_path('app/public/subcategories'), 640, 480, null, false)
         ];
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Subcategory;
 use App\Models\User;
 use Database\Factories\CategoryFactory;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Str;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
@@ -25,6 +26,7 @@ class Semana2Test extends DuskTestCase
         $this->browse(function (Browser $browser) use ($category) {
             $browser->visit('/')
                     ->click('@perfil')
+                    ->pause(500)
                     ->assertSeeLink('Iniciar sesión')
                     ->assertSeeLink('Registrarse')
                     ->screenshot('login');
@@ -50,17 +52,51 @@ class Semana2Test extends DuskTestCase
     public function it_can_shows_at_least_5_products_at_the_home_page()
     {
         $category = Category::factory()->create();
-        $product = $this->createProduct($category);
-        $product2 = $this->createProduct($category);
-        $deleted = $this->createProduct($category, Product::BORRADOR);
 
-        $this->browse(function (Browser $browser) use ($product, $product2, $deleted) {
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product2 = $this->createProduct($subcategory->id, $brand->id);
+        $product3 = $this->createProduct($subcategory->id, $brand->id);
+        $product4 = $this->createProduct($subcategory->id, $brand->id);
+        $product5 = $this->createProduct($subcategory->id, $brand->id);
+
+        $this->browse(function (Browser $browser) use ($product, $product2, $product3, $product4, $product5) {
             $browser->visit('/')
                 ->pause(500)
-                ->assertSee($product->name)
-                ->assertSee($product2->name)
-                ->assertDontSee($deleted->name)
+                ->assertSee(Str::limit($product->name,20))
+                ->assertSee(Str::limit($product2->name,20))
+                ->assertSee(Str::limit($product3->name,20))
+                ->assertSee(Str::limit($product4->name,20))
+                ->assertSee(Str::limit($product5->name,20))
                 ->screenshot('5products');
+        });
+    }
+
+    /** @test  */
+    public function it_shows_only_published_products()
+    {
+        $category = Category::factory()->create();
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product3 = $this->createProduct($subcategory->id, $brand->id);
+
+        $product2 = Product::factory()->create([
+            'subcategory_id' => $subcategory->id,
+            'brand_id' => $brand->id,
+            'status' => Product::BORRADOR,
+        ]);
+
+        $this->browse(function (Browser $browser) use ($category, $product, $product2, $product3) {
+            $browser->visit('/')
+                ->assertSee(Str::limit($product->name,20))
+                ->assertDontSee($product2->name)
+                ->assertSee(Str::limit($product3->name,20))
+                ->screenshot('shows-only-published-products');
         });
     }
 
@@ -69,16 +105,19 @@ class Semana2Test extends DuskTestCase
     {
         $category = Category::factory()->create();
 
-        $product = $this->createProduct($category);
-        $product2 = $this->createProduct($category);
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product2 = $this->createProduct($subcategory->id, $brand->id);
 
         $this->browse(function (Browser $browser) use ($category, $product, $product2) {
             $browser->visit('/categories/' . $category->slug)
                 ->pause(500)
                 ->assertSee('Subcategorías')
                 ->assertSee('Marcas')
-                ->assertSee($product->name)
-                ->assertSee($product2->name)
+                ->assertSee(Str::limit($product->name,20))
+                ->assertSee(Str::limit($product2->name,20))
                 ->screenshot('category-details');
         });
     }
@@ -88,8 +127,14 @@ class Semana2Test extends DuskTestCase
     {
         $category = Category::factory()->create();
 
-        $product = $this->createProduct($category);
-        $product2 = $this->createProduct($category);
+        $subcategory = $this->createSubcategory($category->id);
+        $subcategory2 = $this->createSubcategory($category->id);
+
+        $brand = $this->createBrand($category->id);
+        $brand2 = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product2 = $this->createProduct($subcategory2->id, $brand2->id);
 
         $this->browse(function (Browser $browser) use ($category, $product, $product2) {
             $browser->visit('/categories/' . $category->slug)
@@ -97,9 +142,9 @@ class Semana2Test extends DuskTestCase
                 ->assertSee('Subcategorías')
                 ->assertSee('Marcas')
                 ->click('@filterSubcategory')
-                ->assertSee($product->name)
-                ->assertDontSee($product2->name)
-                ->screenshot('filter-by-sub-at-category-details');
+                ->assertSee(Str::limit($product->name,20))
+                ->assertDontSee(Str::limit($product2->name,20))
+                ->screenshot('filter-by-subcategory-at-category-details');
         });
     }
 
@@ -108,8 +153,14 @@ class Semana2Test extends DuskTestCase
     {
         $category = Category::factory()->create();
 
-        $product = $this->createProduct($category);
-        $product2 = $this->createProduct($category);
+        $subcategory = $this->createSubcategory($category->id);
+        $subcategory2 = $this->createSubcategory($category->id);
+
+        $brand = $this->createBrand($category->id);
+        $brand2 = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product2 = $this->createProduct($subcategory2->id, $brand2->id);
 
         $this->browse(function (Browser $browser) use ($category, $product, $product2) {
             $browser->visit('/categories/' . $category->slug)
@@ -117,8 +168,8 @@ class Semana2Test extends DuskTestCase
                 ->assertSee('Subcategorías')
                 ->assertSee('Marcas')
                 ->click('@filterBrand')
-                ->assertSee($product->name)
-                ->assertDontSee($product2->name)
+                ->assertSee(Str::limit($product->name,20))
+                ->assertDontSee(Str::limit($product2->name,20))
                 ->screenshot('filter-by-brand-at-category-details');
         });
     }
@@ -128,7 +179,10 @@ class Semana2Test extends DuskTestCase
     {
         $category = Category::factory()->create();
 
-        $product = $this->createProduct($category);
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
 
         $this->browse(function (Browser $browser) use ($category, $product) {
             $browser->visit('/products/' . $product->slug)
@@ -150,7 +204,11 @@ class Semana2Test extends DuskTestCase
     public function the_limit_of_the_increment_button_is_the_max_quantity()
     {
         $category = Category::factory()->create();
-        $product = $this->createProduct($category);
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct3($subcategory->id, $brand->id);
 
         $this->browse(function (Browser $browser) use ($category, $product) {
             $browser->visit('/products/' . $product->slug)
@@ -169,7 +227,11 @@ class Semana2Test extends DuskTestCase
     public function the_limit_of_the_decrement_button_is_1()
     {
         $category = Category::factory()->create();
-        $product = $this->createProduct($category);
+
+        $subcategory = $this->createSubcategory($category->id);
+        $brand = $this->createBrand($category->id);
+
+        $product = $this->createProduct($subcategory->id, $brand->id);
 
         $this->browse(function (Browser $browser) use ($category, $product) {
             $browser->visit('/products/' . $product->slug)
@@ -185,47 +247,21 @@ class Semana2Test extends DuskTestCase
     /** @test  */
     public function visible_size_and_color_select_depending_its_subcategory()
     {
-        $brand = Brand::factory()->create();
+        $category = Category::factory()->create();
 
-        $category1 = Category::factory()->create();
-        $category2 = Category::factory()->create();
-        $category3 = Category::factory()->create();
+        $brand = $this->createBrand($category->id);
 
-        $category1->brands()->attach($brand->id);
-        $category2->brands()->attach($brand->id);
-        $category3->brands()->attach($brand->id);
+        $subcategory = $this->createSubcategory($category->id, true);
+        $subcategory2 = $this->createSubcategory($category->id, true, true);
 
-        $subcategory1 = Subcategory::factory()->create([
-            'category_id' => $category1->id,
-            'color' => false,
-            'size' => false
-        ]);
+        $color = $this->createColor();
 
-        $subcategory2 = Subcategory::factory()->create([
-            'category_id' => $category2->id,
-            'color' => true,
-            'size' => false
-        ]);
-
-        $subcategory3 = Subcategory::factory()->create([
-            'category_id' => $category3->id,
-            'color' => true,
-            'size' => true
-        ]);
-
-        $product1 = Product::factory()->create([
-            'subcategory_id' => $subcategory1->id,
-            'quantity' => 10
-        ]);
+        $product = $this->createProduct($subcategory->id, $brand->id, Product::PUBLICADO, $color);
+        $product2 = $this->createProduct($subcategory2->id, $brand->id, Product::PUBLICADO, $color);
 
         Image::factory()->create([
-            'imageable_id' => $product1->id,
+            'imageable_id' => $product->id,
             'imageable_type' => Product::class,
-        ]);
-
-        $product2 = Product::factory()->create([
-            'subcategory_id' => $subcategory2->id,
-            'quantity' => 10
         ]);
 
         Image::factory()->create([
@@ -233,60 +269,19 @@ class Semana2Test extends DuskTestCase
             'imageable_type' => Product::class,
         ]);
 
-        $product3 = Product::factory()->create([
-            'subcategory_id' => $subcategory3->id,
-            'quantity' => 10
-        ]);
-
-        Image::factory()->create([
-            'imageable_id' => $product3->id,
-            'imageable_type' => Product::class,
-        ]);
-
-        $this->browse(function (Browser $browser) use ($product1, $product2, $product3) {
-            $browser->visit('/products/' . $product1->slug)
-                ->pause(500)
-                ->assertNotPresent('@colorSelect')
-                ->assertNotPresent('@sizeSelect')
-                ->screenshot('notcolornorsize');
-
-            $browser->visit('/products/' . $product2->slug)
+        $this->browse(function (Browser $browser) use ($product, $product2) {
+            $browser->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->assertPresent('@colorSelect')
                 ->assertNotPresent('@sizeSelect')
                 ->screenshot('onlycolor');
 
-            $browser->visit('/products/' . $product3->slug)
+            $browser->visit('/products/' . $product2->slug)
                 ->pause(500)
                 ->assertPresent('@colorSelect')
                 ->pause(500)
                 ->assertPresent('@sizeSelect')
                 ->screenshot('bothcolorandsize');
         });
-    }
-
-    private function createProduct($category, $status = Product::PUBLICADO, $size = false, $color = false) {
-        $subcategory = Subcategory::factory()->create([
-            'category_id' => $category->id,
-            'color' => $color,
-            'size' => $size
-        ]);
-
-        $brand = Brand::factory()->create();
-        $category->brands()->attach($brand->id);
-
-        $product = Product::factory()->create([
-            'subcategory_id' => $subcategory->id,
-            'brand_id' => $brand->id,
-            'status' => $status,
-            'quantity' => 3,
-        ]);
-
-        Image::factory()->create([
-            'imageable_id' => $product->id,
-            'imageable_type' => Product::class,
-        ]);
-
-        return $product;
     }
 }
