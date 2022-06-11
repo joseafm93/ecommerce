@@ -11,7 +11,7 @@ use App\Models\Size;
 use App\Models\Subcategory;
 use App\Models\User;
 use Faker\Factory;
-use Laravel\Jetstream\Role;
+use Spatie\Permission\Models\Role;
 
 trait TestHelpers
 {

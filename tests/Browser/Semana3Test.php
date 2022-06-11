@@ -264,7 +264,6 @@ class Semana3Test extends DuskTestCase
                 ->click('@destroyCart')
                 ->pause(200)
                 ->assertSee('TU CARRITO DE COMPRAS ESTÁ VACÍO')
-                ->assert
                 ->screenshot('destroy-cart');
         });
     }

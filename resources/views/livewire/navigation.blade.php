@@ -19,7 +19,7 @@
             @livewire('search')
         </div>
 
-        <div class="user-dropdown mx-6 relative hidden md:block">
+        <div dusk="userDropdown" class="user-dropdown mx-6 relative hidden md:block">
             @auth
                 <x-jet-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -38,7 +38,7 @@
                             {{ __('Profile') }}
                         </x-jet-dropdown-link>
 
-                        <x-jet-dropdown-link href="{{ route('orders.index') }}">
+                        <x-jet-dropdown-link dusk="myOrders" href="{{ route('orders.index') }}">
                             {{ __('My Orders') }}
                         </x-jet-dropdown-link>
 
