@@ -22,14 +22,12 @@ class Semana3Test extends DuskTestCase
 {
     use DatabaseMigrations;
 
+    /*Todos los test de esta clase refactorizados*/
+
     /** @test */
     public function a_product_without_size_or_color_can_be_added_to_cart()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product = $this->createProductAll();
 
         Image::factory()->create([
             'imageable_id' => $product->id,
@@ -51,16 +49,9 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function a_product_with_color_can_be_added_to_cart()
     {
-        $category = Category::factory()->create();
+        $product = $this->createProductAll(true);
 
-        $subcategory = $this->createSubcategory($category->id, true);
-        $brand = $this->createBrand($category->id);
-
-        $color = $this->createColor();
-
-        $product = $this->createProduct($subcategory->id, $brand->id, Product::PUBLICADO, array($color));
-
-        $this->browse(function (Browser $browser) use ($category, $product) {
+        $this->browse(function (Browser $browser) use ($product) {
             $browser->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->assertButtonDisabled('@ColorAddItemToCart')
@@ -79,21 +70,7 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function a_product_with_color_and_size_can_be_added_to_cart()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id, true, true);
-        $brand = $this->createBrand($category->id);
-
-        $color = $this->createColor();
-
-        $product = $this->createProduct($subcategory->id, $brand->id, Product::PUBLICADO, array($color));
-
-        Image::factory()->create([
-            'imageable_id' => $product->id,
-            'imageable_type' => Product::class,
-        ]);
-
-        $size = $this->createSize($product->id, array($color));
+        $product = $this->createProductAll(true, true);
 
         $this->browse(function (Browser $browser) use ($product) {
             $browser->visit('/products/' . $product->slug)
@@ -118,12 +95,7 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function the_red_circle_increments_when_adding_a_product()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product = $this->createProductAll();
 
         $this->browse(function (Browser $browser) use ($product) {
             $browser->visit('/products/' . $product->slug)
@@ -147,12 +119,7 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function the_limit_of_stock_is_the_limit_of_adding_that_product_to_the_cart()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct3($subcategory->id, $brand->id);
+        $product = $this->createProductAll();
 
         $this->browse(function (Browser $browser) use ($product) {
             $browser->visit('/products/' . $product->slug)
@@ -170,13 +137,8 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function we_can_see_the_products_in_the_cart()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct($subcategory->id, $brand->id);
-        $product2 = $this->createProduct($subcategory->id, $brand->id);
+        $product = $this->createProductAll();
+        $product2 = $this->createProductAll();
 
         $this->browse(function (Browser $browser) use ($product, $product2) {
            $browser->visit('/products/' . $product->slug)
@@ -198,12 +160,7 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function we_can_change_the_product_quantity_in_the_cart()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct($subcategory->id, $brand->id);
+        $product = $this->createProductAll();
 
         $this->browse(function (Browser $browser) use ($product) {
             $browser->visit('/products/' . $product->slug)
@@ -216,7 +173,8 @@ class Semana3Test extends DuskTestCase
                 ->assertSee($product->name)
                 ->assertSee($product->price)
                 ->click('@cartIncrementButton')
-                ->assertSee('Total: ' . 2*$product->price . ' €')
+                ->pause(200)
+                ->assertSee('Total: ' . $product->price * 2 . ' €')
                 ->screenshot('change-product-quantity-in-cart');
         });
     }
@@ -224,13 +182,8 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function we_can_delete_a_product_or_remove_all_in_the_cart()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct($subcategory->id, $brand->id);
-        $product2 = $this->createProduct($subcategory->id, $brand->id);
+        $product = $this->createProductAll();
+        $product2 = $this->createProductAll();
 
         $this->browse(function (Browser $browser) use ($product, $product2) {
             $browser->visit('/products/' . $product->slug)
@@ -271,16 +224,9 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function only_a_logged_user_can_make_orders()
     {
-        $category = Category::factory()->create();
+        $product = $this->createProductAll();
 
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct($subcategory->id, $brand->id);
-
-        $user = User::factory()->create();
-
-        $this->browse(function (Browser $browser) use ($product, $user) {
+        $this->browse(function (Browser $browser) use ($product) {
             $browser->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->click('@addItemToCart')
@@ -294,7 +240,7 @@ class Semana3Test extends DuskTestCase
                 ->assertPathIs('/login')
                 ->screenshot('not-logged-user-make-order');
 
-            $browser->loginAs($user)
+            $browser->loginAs(User::factory()->create())
                 ->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->click('@addItemToCart')
@@ -314,13 +260,9 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function the_cart_is_saved_on_DB_when_log_out()
     {
-        $category = Category::factory()->create();
+        $product = $this->createProductAll();
 
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct($subcategory->id, $brand->id);
-
+        /*Aqui creo una variable usuario para loguear las 2 veces con el mismo usuario*/
         $user = User::factory()->create();
 
         $this->assertDatabaseCount('shoppingcart', 0);
@@ -349,17 +291,10 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function form_is_visible_only_when_delivery_option_is_selected()
     {
-        $category = Category::factory()->create();
+        $product = $this->createProductAll();
 
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct($subcategory->id, $brand->id);
-
-        $user = User::factory()->create();
-
-        $this->browse(function (Browser $browser) use ($product, $user) {
-            $browser->loginAs($user)
+        $this->browse(function (Browser $browser) use ($product) {
+            $browser->loginAs(User::factory()->create())
                 ->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->click('@addItemToCart')
@@ -382,17 +317,10 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function the_order_is_made_and_the_cart_is_destroyed()
     {
-        $category = Category::factory()->create();
+        $product = $this->createProductAll();
 
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-
-        $product = $this->createProduct($subcategory->id, $brand->id);
-
-        $user = User::factory()->create();
-
-        $this->browse(function (Browser $browser) use ($product, $user) {
-            $browser->loginAs($user)
+        $this->browse(function (Browser $browser) use ($product) {
+            $browser->loginAs(User::factory()->create())
                 ->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->click('@addItemToCart')
@@ -413,18 +341,12 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function department_select_has_all_departments()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-        $product = $this->createProduct($subcategory->id, $brand->id);
-
-        $user = User::factory()->create();
+        $product = $this->createProductAll();
 
         $departments = Department::factory(2)->create()->pluck('id')->all();
 
-        $this->browse(function (Browser $browser) use ($product, $user, $departments) {
-            $browser->loginAs($user)
+        $this->browse(function (Browser $browser) use ($product, $departments) {
+            $browser->loginAs(User::factory()->create())
                 ->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->click('@addItemToCart')
@@ -442,13 +364,7 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function cities_select_has_cities_from_its_department()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-        $product = $this->createProduct($subcategory->id, $brand->id);
-
-        $user = User::factory()->create();
+        $product = $this->createProductAll();
 
         $departments = Department::factory(2)->create();
         $cities= City::factory(2)->create([
@@ -460,8 +376,8 @@ class Semana3Test extends DuskTestCase
         $idCities = $cities->pluck('id')->all();
         $idCities2 = $cities2->pluck('id')->all();
 
-        $this->browse(function (Browser $browser) use ($product, $user, $idCities, $idCities2) {
-            $browser->loginAs($user)
+        $this->browse(function (Browser $browser) use ($product, $idCities, $idCities2) {
+            $browser->loginAs(User::factory()->create())
                 ->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->click('@addItemToCart')
@@ -480,13 +396,7 @@ class Semana3Test extends DuskTestCase
     /** @test */
     public function districts_select_has_districts_from_its_city()
     {
-        $category = Category::factory()->create();
-
-        $subcategory = $this->createSubcategory($category->id);
-        $brand = $this->createBrand($category->id);
-        $product = $this->createProduct($subcategory->id, $brand->id);
-
-        $user = User::factory()->create();
+        $product = $this->createProductAll();
 
         $departments = Department::factory(2)->create();
         $cities= City::factory(2)->create([
@@ -502,8 +412,8 @@ class Semana3Test extends DuskTestCase
         $idDistricts = $districts->pluck('id')->all();
         $idDistricts2 = $districts2->pluck('id')->all();
 
-        $this->browse(function (Browser $browser) use ($product, $user, $idDistricts, $idDistricts2) {
-            $browser->loginAs($user)
+        $this->browse(function (Browser $browser) use ($product, $idDistricts, $idDistricts2) {
+            $browser->loginAs(User::factory()->create())
                 ->visit('/products/' . $product->slug)
                 ->pause(500)
                 ->click('@addItemToCart')

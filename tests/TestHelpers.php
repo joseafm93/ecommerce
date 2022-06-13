@@ -29,10 +29,19 @@ trait TestHelpers
         ]);
     }
 
+    protected function createBrand($categoryId)
+    {
+        $brand = Brand::factory()->create();
+        $category = Category::find($categoryId);
+        $category->brands()->attach($brand);
+
+        return $brand;
+    }
+
     protected function createColor()
     {
         return Color::create([
-           'name' => Factory::create()->colorName
+            'name' => Factory::create()->colorName()
         ]);
     }
 
@@ -44,42 +53,11 @@ trait TestHelpers
         ]);
     }
 
-    protected function createBrand($categoryId)
-    {
-        $brand = Brand::factory()->create();
-        $category = Category::find($categoryId);
-        $category->brands()->attach($brand);
-
-        return $brand;
-    }
-
-    protected function createSize($productId, $colors)
+    protected function createSize($productId)
     {
         $size = Size::factory()->create([
             'product_id' => $productId
         ]);
-
-        foreach ($colors as $color) {
-            $size->colors()
-                ->attach([
-                    $color->id => ['quantity' => 12]
-                ]);
-        }
-
-        return $size;
-    }
-
-    protected function createSize3($productId, $colors)
-    {
-        $size = Size::factory()->create([
-            'product_id' => $productId
-        ]);
-
-        foreach ($colors as $color) {
-            $size->colors()->attach([
-                $color->id => ['quantity' => 1]
-            ]);
-        }
 
         return $size;
     }
@@ -140,5 +118,35 @@ trait TestHelpers
         $user->assignRole($adminRole);
 
         return $user;
+    }
+
+    protected function createProductAll($hasColor = false, $hasSize = false, $status = Product::PUBLICADO)
+    {
+        $category = $this->createCategory();
+
+        $subcategory = $this->createSubcategory($category->id, $hasColor, $hasSize);
+
+        $brand = $this->createBrand($category->id);
+        $product = Product::factory()->create([
+            'subcategory_id' => $subcategory->id,
+            'brand_id' => $brand->id,
+            'quantity' => $subcategory->color ? null : 3,
+            'status' => $status,
+            'price' => 84.99,
+        ]);
+
+        $this->createImage($product->id, Product::class);
+
+        if ($hasColor && !$hasSize) {
+            $color = $this->createColor();
+            $product->colors()->attach($color->id, ['quantity' => '3']);
+        }
+        if ($hasColor && $hasSize) {
+            $color = $this->createColor();
+            $size = $this->createSize($product->id);
+            $size->colors()->attach([$color->id => ['quantity' => 12]]);
+        }
+
+        return $product;
     }
 }
