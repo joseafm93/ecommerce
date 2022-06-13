@@ -29,11 +29,6 @@ class Semana3Test extends DuskTestCase
     {
         $product = $this->createProductAll();
 
-        Image::factory()->create([
-            'imageable_id' => $product->id,
-            'imageable_type' => Product::class,
-        ]);
-
         $this->browse(function (Browser $browser) use ($product) {
             $browser->visit('/products/' . $product->slug)
                 ->pause(500)
