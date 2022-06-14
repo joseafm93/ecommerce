@@ -1,3 +1,3 @@
 Los tests los empecé a hacer despues del commit "Fin pasos", a partir de ahí no me centré en hacer commits, por lo que he hecho bastantes en el mismo commit.
 
-Aun así, sin ser exactos, los tests de la semana 1 y 2, y el inicio de la semana 3 están en "Semana 3 Tarea 1 mitad"; el resto de esa semana están en "Fin Tareas Semana 3"; la semana 4 está en "Fin Tareas", y más tarde empecé con las tareas finales
+Aun así, sin ser exactos, los tests de la semana 1 y 2, y el inicio de la semana 3 están en "Semana 3 Tarea 1 mitad"; el resto de esa semana están en "Fin Tareas Semana 3"; la semana 4 está en "Fin Tareas" (más tarde refactoricé los tests de dusk de la semana 3 en "Tests Semana3(Browser) refactorizados") y por último están los commit de las tareas finales (solo la 2, la 1 y 3 no las he hecho) en "TFinal2-Columnas hechas" y "TFinal2-Columnas y filtros terminado"
