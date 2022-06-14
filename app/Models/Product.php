@@ -41,18 +41,29 @@ class Product extends Model
         return $this->morphMany(Image::class, 'imageable');
     }
 
+    public function scopeFilterBy($query, QueryFilter $filters, array $data)
+    {
+        return $filters->applyto($query, $data);
+    }
+
     public function getRouteKeyName()
     {
         return 'slug';
     }
 
-    public function getStockAttribute(){
+    public function newEloquentBuilder($query)
+    {
+        return new ProductQuery($query);
+    }
+
+    public function getStockAttribute()
+    {
         if ($this->subcategory->size) {
-            return ColorSize::whereHas('size.product', function(Builder $query){
+            return ColorSize::whereHas('size.product', function (Builder $query) {
                 $query->where('id', $this->id);
             })->sum('quantity');
         } elseif ($this->subcategory->color) {
-            return ColorProduct::whereHas('product', function(Builder $query){
+            return ColorProduct::whereHas('product', function (Builder $query) {
                 $query->where('id', $this->id);
             })->sum('quantity');
         } else {
