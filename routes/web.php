@@ -38,3 +38,6 @@ Route::middleware(['auth'])->group(function (){
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('orders/{order}/payment', PaymentOrder::class)->name('orders.payment');
 });
+
+// Email related routes
+Route::get('mail/send', [\App\Http\Controllers\MailController::class]);
