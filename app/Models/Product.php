@@ -64,6 +64,21 @@ class Product extends Model
         return $counter;
     }
 
+    public function getPendienteAttribute()
+    {
+        $id = $this->id;
+        $statuses = Order::select('status')->get();
+
+        $counter = 0;
+        foreach ($statuses as $status) {
+
+            if ($status[0] = '1') {
+                $counter = $counter + $status['qty'];
+            };
+        }
+        return $counter;
+    }
+
     public function getRouteKeyName()
     {
         return 'slug';
