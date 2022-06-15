@@ -14,7 +14,7 @@ class ShowProducts2 extends Component
     use WithPagination;
 
     public $pagination = 10;
-    public $columns = ['Nombre', 'Categoría', 'Subcategoría', 'Marca', 'Fecha de creación', 'Stock', 'Color', 'Talla', 'Estado', 'Precio'];
+    public $columns = ['Nombre', 'Categoría', 'Subcategoría', 'Marca', 'Ventas', 'Pendientes', 'Fecha de creación', 'Stock', 'Color', 'Talla', 'Estado', 'Precio'];
     public $search, $categorySearch, $subcategorySearch, $brandSearch, $priceSearch, $colorsSearch, $sizesSearch;
     public $status = 2;
     public $selectedColumns = [];

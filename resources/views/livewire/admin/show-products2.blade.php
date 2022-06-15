@@ -137,6 +137,24 @@
                                     </button>
                                 </th>
                             @endif
+                            @if($this->showColumn('Ventas'))
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ventas
+                                    <button wire:click="sortable()">
+                                        <span class="fa fa{{ $camp === '' ? $icon : '-circle' }}"></span>
+                                    </button>
+                                </th>
+                            @endif
+                            @if($this->showColumn('Pendientes'))
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Pendientes
+                                    <button wire:click="sortable()">
+                                        <span class="fa fa{{ $camp === '' ? $icon : '-circle' }}"></span>
+                                    </button>
+                                </th>
+                            @endif
                             @if ($this->showColumn('Fecha Creación'))
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -228,6 +246,16 @@
                                     <div class="text-sm text-gray-900">
                                         {{ $product->brand->name }}
                                     </div>
+                                </td>
+                            @endif
+                            @if($this->showColumn('Ventas'))
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $product->sales }}</div>
+                                </td>
+                            @endif
+                            @if($this->showColumn('Pendientes'))
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $product->sales }}</div>
                                 </td>
                             @endif
                             @if ($this->showColumn('Fecha Creación'))
